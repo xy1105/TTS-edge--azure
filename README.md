@@ -72,8 +72,8 @@
 2. **下载仓库**
     
     ```bash
-    git clone https://github.com/你的用户名/TTS-Edge-Azure.git
-    cd TTS-Edge-Azure
+    git clone https://github.com/xy1105/TTS-edge--azure.git
+    cd TTS-edge-azure
     ```
     
 3. **一键启动（Windows）**  
