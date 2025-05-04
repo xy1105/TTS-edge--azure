@@ -3,7 +3,7 @@
 这是一个简洁易用的文本转语音 (TTS) 应用程序，旨在将任意文本内容快速转换为清晰的语音进行朗读。无论你是想听文章、校对文稿，还是需要在多任务处理时接收信息，它都能提供便捷的语音合成体验。
 
 **软件截图:**
-![440193632-e733f355-5329-46cc-9727-64782b29ca13](https://github.com/user-attachments/assets/30b4b954-6e68-4a0a-b493-61b5a31f9c57)
+<img src="https://github.com/user-attachments/assets/30b4b954-6e68-4a0a-b493-61b5a31f9c57" width="400"/>
 
 
 
