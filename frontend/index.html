@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edge TTS Studio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Link the unified stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Remove link to azure.css -->
+</head>
+<body>
+  <!-- Service Switcher -->
+  <div class="service-switcher">
+    <a href="/" class="service-btn active">Edge TTS</a>
+    <a href="/azure" class="service-btn">Azure TTS</a>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Edge TTS Studio</h1>
+    <p>使用 Microsoft Edge 的语音合成技术，轻松创建自然流畅的语音内容</p>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container">
+
+    <!-- 1. Voice Selection -->
+    <div class="form-section">
+      <h3 class="section-title">语音选择</h3>
+      <div class="form-group">
+        <label for="voiceSelect" class="form-label">选择语音模型</label>
+        <div class="form-flex">
+          <select id="voiceSelect" class="form-control">
+            <option value="">(请先获取语音列表)</option>
+          </select>
+          <button class="btn btn-primary" id="btnGetVoices">
+            <i class="fas fa-sync-alt"></i> 获取语音
+          </button>
+        </div>
+        <div id="voiceStatus" class="status-indicator ready" style="margin-top: 10px;"> <!-- Default state -->
+             <i class="fas fa-check-circle"></i> 准备就绪
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Text Input -->
+    <div class="form-section">
+      <h3 class="section-title">文本内容</h3>
+      <div class="form-group">
+        <label for="textInput" class="form-label">输入文本</label>
+        <textarea id="textInput" class="form-control" rows="5" placeholder="在此处输入或粘贴要转换成语音的文本..." maxlength="50000"></textarea>
+        <div id="charCounter" class="char-counter">0/50000</div>
+      </div>
+    </div>
+
+    <!-- 3. Voice Parameters -->
+    <div class="form-section">
+      <h3 class="section-title">语音参数调整</h3>
+      <!-- Rate Control -->
+      <div class="form-group">
+        <label for="rateSlider" class="form-label">语速 (Rate)</label>
+        <div class="slider-container">
+          <input type="range" id="rateSlider" class="slider" min="-100" max="100" value="0" step="1"> <!-- Adjusted range for Edge -->
+          <div id="rateDisplay" class="slider-value">0%</div>
+        </div>
+      </div>
+      <!-- Volume Control -->
+      <div class="form-group">
+        <label for="volumeSlider" class="form-label">音量 (Volume)</label>
+        <div class="slider-container">
+          <input type="range" id="volumeSlider" class="slider" min="-100" max="100" value="0" step="1"> <!-- Adjusted range for Edge -->
+          <div id="volumeDisplay" class="slider-value">0%</div>
+        </div>
+      </div>
+      <!-- Pitch Control -->
+      <div class="form-group">
+        <label for="pitchSlider" class="form-label">音高 (Pitch)</label>
+        <div class="slider-container">
+          <input type="range" id="pitchSlider" class="slider" min="-50" max="50" value="0" step="1"> <!-- Range for pydub post-processing -->
+          <div id="pitchDisplay" class="slider-value">0 st</div> <!-- Indicate semitones maybe? -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Presets -->
+    <div class="form-section">
+        <h3 class="section-title">预设管理</h3>
+        <div class="form-group">
+            <label for="presetSelect" class="form-label">加载或删除预设</label>
+            <div class="form-flex">
+                <select id="presetSelect" class="form-control">
+                    <option value="">选择预设...</option>
+                </select>
+                <button class="btn btn-secondary" id="btnLoadPreset">
+                    <i class="fas fa-upload"></i> 加载
+                </button>
+                <button class="btn btn-danger" id="btnDeletePreset"> <!-- Danger button for delete -->
+                    <i class="fas fa-trash"></i> 删除
+                </button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="presetName" class="form-label">保存当前设置为新预设</label>
+             <div class="form-flex">
+                <input type="text" id="presetName" class="form-control" placeholder="输入新预设名称">
+                <button class="btn btn-primary" id="btnSavePreset">
+                    <i class="fas fa-save"></i> 保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Output Format -->
+    <div class="form-section">
+      <h3 class="section-title">输出格式</h3>
+      <div class="form-group">
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="format" value="mp3" checked class="radio-input">
+            <span class="radio-custom"></span>
+            <span>MP3 格式</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="format" value="wav" class="radio-input">
+            <span class="radio-custom"></span>
+            <span>WAV 格式</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Actions -->
+    <div class="form-section">
+        <h3 class="section-title">操作</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <button class="btn btn-accent" id="btnGenerate">
+                <i class="fas fa-magic"></i> 生成语音
+            </button>
+            <button class="btn btn-secondary" id="btnClear">
+                <i class="fas fa-broom"></i> 清空文本
+            </button>
+            <button class="btn btn-secondary" id="btnResetSettings">
+                <i class="fas fa-undo"></i> 重置设置
+            </button>
+        </div>
+    </div>
+
+    <!-- 7. Audio Player -->
+    <div class="form-section audio-section">
+      <h3 class="section-title">音频播放器</h3>
+      <!-- Use custom player elements -->
+      <div class="custom-audio-player">
+        <div class="time-display">
+          <span id="currentTime">00:00</span>
+          <span id="totalTime">00:00</span>
+        </div>
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar" id="progressBar"></div>
+          <div class="progress-handle" id="progressHandle"></div>
+        </div>
+        <audio id="audioPlayer" style="display: none;"></audio> <!-- Hide native player if using custom controls fully -->
+      </div>
+
+      <div class="player-controls">
+        <button class="player-btn" id="btnPlayPause" title="播放/暂停">
+          <i class="fas fa-play" id="playIcon"></i>
+        </button>
+        <div class="player-speed-btns">
+          <!-- Use data-speed attribute consistently -->
+          <button class="speed-btn" data-speed="0.75">0.75x</button>
+          <button class="speed-btn active" data-speed="1">1x</button>
+          <button class="speed-btn" data-speed="1.25">1.25x</button>
+          <button class="speed-btn" data-speed="1.5">1.5x</button>
+        </div>
+        <button class="btn btn-secondary" id="btnDownload" disabled> <!-- Use standard button class -->
+          <i class="fas fa-download"></i> 下载音频
+        </button>
+      </div>
+    </div>
+
+  </div> <!-- End Main Container -->
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Preset Modal (if needed - currently save is inline) -->
+  <!--
+  <div class="modal" id="presetModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>保存预设</h3>
+      <input type="text" id="modalPresetName" class="form-control" placeholder="输入预设名称">
+      <div class="form-flex" style="margin-top: 1.5rem;">
+         <button class="btn btn-secondary" id="btnModalCancel">取消</button>
+         <button class="btn btn-primary" id="btnModalSave">保存</button>
+      </div>
+    </div>
+  </div>
+  -->
+
+  <!-- Scripts: Common first, then page-specific -->
+  <script src="js/common.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

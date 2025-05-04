@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azure TTS Studio</title>
+  <!-- Link Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Link the unified stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Remove link to azure.css -->
+</head>
+<body>
+  <!-- Service Switcher -->
+  <div class="service-switcher">
+    <a href="/" class="service-btn">Edge TTS</a>
+    <a href="/azure" class="service-btn active">Azure TTS</a>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Azure TTS Studio</h1>
+    <p>使用 Microsoft Azure 语音服务，生成专业级语音</p>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container">
+
+    <!-- 1. Azure Configuration -->
+    <div class="form-section">
+      <h3 class="section-title">Azure 服务配置</h3>
+      <div class="form-group">
+        <label for="azureApiKey" class="form-label">Azure API 密钥 (Subscription Key)</label>
+        <input type="password" id="azureApiKey" class="form-control" placeholder="请输入 Azure Speech Service API 密钥">
+      </div>
+       <div class="form-group">
+         <label for="azureRegion" class="form-label">服务区域 (Region)</label>
+         <div class="form-flex">
+            <select id="azureRegion" class="form-control">
+                <option value="eastus">eastus (美国东部)</option>
+                <option value="eastus2">eastus2 (美国东部 2)</option>
+                <option value="westus">westus (美国西部)</option>
+                <option value="westus2">westus2 (美国西部 2)</option>
+                <option value="centralus">centralus (美国中部)</option>
+                <option value="northcentralus">northcentralus (美国中北部)</option>
+                <option value="southcentralus">southcentralus (美国中南部)</option>
+                <option value="westcentralus">westcentralus (美国中西部)</option>
+                <option value="canadacentral">canadacentral (加拿大中部)</option>
+                <option value="brazilsouth">brazilsouth (巴西南部)</option>
+                <option value="westeurope">westeurope (西欧)</option>
+                <option value="northeurope">northeurope (北欧)</option>
+                <option value="uksouth">uksouth (英国南部)</option>
+                <option value="francecentral">francecentral (法国中部)</option>
+                <option value="switzerlandnorth">switzerlandnorth (瑞士北部)</option>
+                <option value="germanywestcentral">germanywestcentral (德国中西部)</option>
+                <option value="norwayeast">norwayeast (挪威东部)</option>
+                <option value="eastasia">eastasia (东亚 - 香港)</option>
+                <option value="southeastasia">southeastasia (东南亚 - 新加坡)</option>
+                <option value="japaneast">japaneast (日本东部)</option>
+                <option value="japanwest">japanwest (日本西部)</option>
+                <option value="koreacentral">koreacentral (韩国中部)</option>
+                <option value="australiaeast">australiaeast (澳大利亚东部)</option>
+                <option value="centralindia">centralindia (印度中部)</option>
+                <option value="uaenorth">uaenorth (阿联酋北部)</option>
+                <option value="southafricanorth">southafricanorth (南非北部)</option>
+            </select>
+             <button class="btn btn-primary" id="btnLoadVoices">
+                <i class="fas fa-sync-alt"></i> 加载语音
+             </button>
+         </div>
+          <!-- Optional: Status indicator -->
+          <div id="voiceStatus" class="status-indicator ready" style="margin-top: 10px;">
+             <i class="fas fa-info-circle"></i> 输入密钥和区域后加载语音
+          </div>
+       </div>
+    </div>
+
+    <!-- 2. Voice & Style Selection -->
+    <div class="form-section">
+        <h3 class="section-title">语音与风格</h3>
+        <div class="form-group">
+            <label for="voiceSelect" class="form-label">选择语音模型</label>
+            <select id="voiceSelect" class="form-control" disabled> <!-- Initially disabled -->
+                <option value="">(请先加载语音列表)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="styleSelect" class="form-label">情感风格 (Style)</label>
+            <select id="styleSelect" class="form-control" disabled>
+                <option value="">(语音加载后可用)</option>
+                <option value="general">(默认风格)</option> <!-- Keep general as default -->
+            </select>
+        </div>
+    </div>
+
+    <!-- 3. Presets -->
+    <div class="form-section">
+        <h3 class="section-title">预设管理</h3>
+         <div class="form-group">
+            <label for="presetSelect" class="form-label">加载或删除预设</label>
+            <div class="form-flex">
+                <select id="presetSelect" class="form-control">
+                    <option value="">选择预设...</option>
+                </select>
+                <button class="btn btn-secondary" id="btnLoadPreset">
+                    <i class="fas fa-upload"></i> 加载
+                </button>
+                <button class="btn btn-danger" id="btnDeletePreset"> <!-- Danger button -->
+                    <i class="fas fa-trash"></i> 删除
+                </button>
+            </div>
+        </div>
+        <div class="form-group">
+             <label for="presetName" class="form-label">保存当前设置为新预设</label>
+             <div class="form-flex">
+                <input type="text" id="presetName" class="form-control" placeholder="输入新预设名称">
+                <button class="btn btn-primary" id="btnSavePreset">
+                    <i class="fas fa-save"></i> 保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Text Input -->
+    <div class="form-section">
+      <h3 class="section-title">文本内容</h3>
+      <div class="form-group">
+        <label for="textInput" class="form-label">输入文本 (支持SSML标签)</label>
+        <textarea id="textInput" class="form-control" rows="5" placeholder="在此处输入或粘贴要合成的文本，可包含SSML标签..."></textarea>
+        <div id="charCounter" class="char-counter">0字</div>
+      </div>
+    </div>
+
+    <!-- 5. Voice Parameters -->
+    <div class="form-section">
+      <h3 class="section-title">语音参数调整</h3>
+      <!-- Rate Control -->
+      <div class="form-group">
+        <label for="rateSlider" class="form-label">语速 (Rate)</label>
+        <div class="slider-container">
+          <input type="range" id="rateSlider" class="slider" min="-100" max="200" value="0" step="1"> <!-- Azure typical range -->
+          <div id="rateDisplay" class="slider-value">0%</div>
+        </div>
+      </div>
+      <!-- Pitch Control -->
+      <div class="form-group">
+        <label for="pitchSlider" class="form-label">音高 (Pitch)</label>
+        <div class="slider-container">
+          <input type="range" id="pitchSlider" class="slider" min="-50" max="50" value="0" step="1"> <!-- Azure typical range -->
+          <div id="pitchDisplay" class="slider-value">0%</div>
+        </div>
+      </div>
+       <!-- Volume Control -->
+      <div class="form-group">
+        <label for="volumeSlider" class="form-label">音量 (Volume)</label>
+        <div class="slider-container">
+          <input type="range" id="volumeSlider" class="slider" min="-100" max="100" value="0" step="1"> <!-- Azure typical range -->
+          <div id="volumeDisplay" class="slider-value">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Actions -->
+    <div class="form-section">
+        <h3 class="section-title">操作</h3>
+        <button class="btn btn-accent" id="btnGenerate">
+            <i class="fas fa-magic"></i> 生成语音
+        </button>
+        <!-- Optional: Add Clear/Reset buttons if desired -->
+         <button class="btn btn-secondary" id="btnClear" style="margin-left: 10px;">
+             <i class="fas fa-broom"></i> 清空文本
+         </button>
+         <button class="btn btn-secondary" id="btnResetSettings" style="margin-left: 10px;">
+             <i class="fas fa-undo"></i> 重置设置
+         </button>
+    </div>
+
+    <!-- 7. Audio Player -->
+    <div class="form-section audio-section">
+      <h3 class="section-title">音频播放器</h3>
+       <!-- Use custom player elements -->
+      <div class="custom-audio-player">
+        <div class="time-display">
+          <span id="currentTime">00:00</span>
+          <span id="totalTime">00:00</span>
+        </div>
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar" id="progressBar"></div>
+          <div class="progress-handle" id="progressHandle"></div>
+        </div>
+        <audio id="audioPlayer" style="display: none;"></audio> <!-- Hide native player -->
+      </div>
+
+      <div class="player-controls">
+        <button class="player-btn" id="btnPlayPause" title="播放/暂停">
+          <i class="fas fa-play" id="playIcon"></i>
+        </button>
+        <div class="player-speed-btns">
+          <button class="speed-btn" data-speed="0.75">0.75x</button>
+          <button class="speed-btn active" data-speed="1">1x</button>
+          <button class="speed-btn" data-speed="1.25">1.25x</button>
+          <button class="speed-btn" data-speed="1.5">1.5x</button>
+        </div>
+        <button class="btn btn-secondary" id="btnDownload" disabled>
+          <i class="fas fa-download"></i> 下载音频
+        </button>
+      </div>
+    </div>
+
+  </div> <!-- End Main Container -->
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts: Common first, then page-specific -->
+  <script src="js/common.js"></script>
+  <script src="js/azure.js"></script>
+</body>
+</html>
